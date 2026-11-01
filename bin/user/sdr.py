@@ -1197,7 +1197,10 @@ class AmbientTX8300Packet(Packet):
         pkt["usUnits"] = weewx.METRIC
         station_id = obj.get("id")
         pkt["channel"] = Packet.get_int(obj, "channel")
-        pkt["battery"] = Packet.get_battery(obj)
+        # rtl_433 reports a raw 2-bit battery value (0-3) whose mapping is
+        # unknown; get_battery() treats anything but "OK" as low, so every
+        # TX8300 read as low. Keep the raw value until the mapping is known.
+        pkt["battery"] = Packet.get_int(obj, "battery")
         pkt["humidity"] = Packet.get_float(obj, "humidity")
         pkt["temperature"] = Packet.get_float(obj, "temperature_C")
         pkt = Packet.add_identifiers(pkt, station_id, AmbientTX8300Packet.__name__)
